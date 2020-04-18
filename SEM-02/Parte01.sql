@@ -134,7 +134,7 @@ select 'TN'=@T1+(@N-1)*@R --salida
  alter table Padron alter column nombres varchar(40)
  alter table Padron alter column apellidos varchar(40)
 
- select 'DNI' as TIPO,numdoc as NUMERO,nombres, apellidos, 
+ select 'DNI' as TIPO,numdoc as NUMERO,ltrim(nombres) as nombres,ltrim(apellidos) as apellidos, 
 		 case idubigeo
 			 when 1 then 'HUACHO' when 2 then 'AMBAR'
 			 when 3 then 'CALETA DE CARQUIN'  when 4 then 'CHECRAS'
@@ -145,3 +145,29 @@ select 'TN'=@T1+(@N-1)*@R --salida
 		 end as UBIGEO
  from Padron
  where idtipo=1
+-- order by nombres asc
+ --order by 3 asc (no recomendado)
+ --ltrim: No considerar espacios en blanco al inicio
+ --order by ltrim(nombres) asc,ltrim(apellidos) desc --Ordenamiento 2 niveles
+ --order by ltrim(nombres)+ltrim(apellidos)
+ order by fecnacimiento asc
+
+ --02.04
+ select idtipo,numdoc as NUMERO,ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO,direccion,
+		 case idubigeo
+			 when 1 then 'HUACHO' when 2 then 'AMBAR'
+			 when 3 then 'CALETA DE CARQUIN'  when 4 then 'CHECRAS'
+			 when 5	then 'HUALMAY'  when 6 then 'HUAURA'
+			 when 7	then 'LEONCIO PRADO'  when 8 then 'PACCHO'
+			 when 9	then 'SANTA LEONOR'  when 10 then 'SANTA MARÍA'
+			 when 11 then 'SAYAN'  when 12 then 'VEGUETA'
+		 end as UBIGEO,
+		 idubigeo,
+		 fecnacimiento
+ from Padron
+ where 
+ --p               --q             --r
+ --(idubigeo=1) or (idubigeo=3) or (idubigeo=5) --predicado (p or q or r)
+ --A=> idubigeo in (1,3,5)
+ --fecnacimiento>='1970-01-01' and fecnacimiento<='1970-12-31'
+ fecnacimiento BETWEEN '1970-01-01' and '1970-12-31'
