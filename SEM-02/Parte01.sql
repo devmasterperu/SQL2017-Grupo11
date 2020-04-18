@@ -185,3 +185,11 @@ select 'TN'=@T1+(@N-1)*@R --salida
  --I=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '_E%E_'
  --J=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '[aeiou]%[aeiou]'--'[]': Permiten buscar dentro de una lista de caracteres
  --K=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '[^aeiou]%[^aeiou]'--'[^]': Permite buscar un caracter diferentes a los valores de la lista
+ --L=>LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE'[AEIOU]%[^AEIOU]'
+ --M=>ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10)
+ --N=>LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'E%' OR idubigeo in (8,9,10)
+ --O=>(ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10)) --p' and q'=>p
+ --AND (LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'E%' OR idubigeo in (8,9,10)) --p' or q'=>q
+ --P=>(ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10)) --p' and q'=>p
+ --OR (LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'E%' OR idubigeo in (8,9,10)) --p' or q'=>q
+ NOT (ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10))
