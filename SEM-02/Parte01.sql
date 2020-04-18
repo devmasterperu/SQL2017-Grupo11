@@ -170,4 +170,9 @@ select 'TN'=@T1+(@N-1)*@R --salida
  --(idubigeo=1) or (idubigeo=3) or (idubigeo=5) --predicado (p or q or r)
  --A=> idubigeo in (1,3,5)
  --fecnacimiento>='1970-01-01' and fecnacimiento<='1970-12-31'
- fecnacimiento BETWEEN '1970-01-01' and '1970-12-31'
+ --B=> fecnacimiento BETWEEN '1970-01-01' and '1970-12-31'
+ --C=>ltrim(nombres)+' '+ltrim(apellidos) LIKE 'A%' --%: No me importa hacia la derecha/izquierda cuantos y que caracteres existen
+ --D=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '%ABA%'
+ --E=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '%AN'
+ --LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE '%O' AND LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'O%'
+ --F=>LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'O%O'
