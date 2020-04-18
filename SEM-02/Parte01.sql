@@ -153,6 +153,10 @@ select 'TN'=@T1+(@N-1)*@R --salida
  order by fecnacimiento asc
 
  --02.04
+
+ --update Padron set nombres='DABADU'
+ --where idpadron=1
+
  select idtipo,numdoc as NUMERO,ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO,direccion,
 		 case idubigeo
 			 when 1 then 'HUACHO' when 2 then 'AMBAR'
@@ -176,3 +180,8 @@ select 'TN'=@T1+(@N-1)*@R --salida
  --E=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '%AN'
  --LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE '%O' AND LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'O%'
  --F=>LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'O%O'
+ --G=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '_ABA%' --'_': Separo posiciones en el patrón.
+ --H=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '%M__'
+ --I=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '_E%E_'
+ --J=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '[aeiou]%[aeiou]'--'[]': Permiten buscar dentro de una lista de caracteres
+ --K=>ltrim(nombres)+' '+ltrim(apellidos) LIKE '[^aeiou]%[^aeiou]'--'[^]': Permite buscar un caracter diferentes a los valores de la lista
