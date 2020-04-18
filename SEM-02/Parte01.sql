@@ -105,5 +105,43 @@ select 'TN'=@T1+(@N-1)*@R --salida
 		 else 'SECTOR_DESCONOCIDO' end as SECTOR
  from Manzana
  
- 
- idsector from Manzana
+ --02.02
+ insert into Sector values ('SECTOR_PRUEBA','Sector no utilizado',0)
+ select nombre,estado,
+		case when estado=1 
+		then nombre+' se encuentra ACTIVO'
+		else nombre+' se encuentra INACTIVO'
+		end as mensaje--nombre+ACTIVO/INACTIVO
+ from Sector
+
+  select nombre,estado,
+		 nombre+
+		 case when estado=1 
+		 then +' se encuentra ACTIVO'
+		 else +' se encuentra INACTIVO'
+		 end as mensaje--nombre+ACTIVO/INACTIVO
+ from Sector
+
+  select nombre,estado,
+		case when estado=1 
+		then concat(nombre,' se encuentra ACTIVO porque su estado es ',estado)
+		else concat(nombre,' se encuentra INACTIVO porque su estado es ',estado)
+		end as mensaje--nombre+ACTIVO/INACTIVO
+ from Sector
+
+ --02.03
+ --Modificar longitud de columnas
+ alter table Padron alter column nombres varchar(40)
+ alter table Padron alter column apellidos varchar(40)
+
+ select 'DNI' as TIPO,numdoc as NUMERO,nombres, apellidos, 
+		 case idubigeo
+			 when 1 then 'HUACHO' when 2 then 'AMBAR'
+			 when 3 then 'CALETA DE CARQUIN'  when 4 then 'CHECRAS'
+			 when 5	then 'HUALMAY'  when 6 then 'HUAURA'
+			 when 7	then 'LEONCIO PRADO'  when 8 then 'PACCHO'
+			 when 9	then 'SANTA LEONOR'  when 10 then 'SANTA MARÍA'
+			 when 11 then 'SAYAN'  when 12 then 'VEGUETA'
+		 end as UBIGEO
+ from Padron
+ where idtipo=1
