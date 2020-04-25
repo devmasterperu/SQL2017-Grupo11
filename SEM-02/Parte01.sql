@@ -193,3 +193,21 @@ select 'TN'=@T1+(@N-1)*@R --salida
  --P=>(ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10)) --p' and q'=>p
  --OR (LTRIM(nombres)+ ' ' +LTRIM(apellidos) LIKE 'E%' OR idubigeo in (8,9,10)) --p' or q'=>q
  NOT (ltrim(direccion) like 'A%' and idubigeo in (7,8,9,10))
+
+ --02.05
+ --COUNT(columna|expresion)=>Total de ocurrencias
+ --MAX(columna|expresion)=>Máximo valor
+ --MIN(columna|expresion)=>Mínimo valor
+ --AVG(columna|expresion)=>Promedio valor
+
+ select idubigeo,count(idpadron) as TOTAL,max(fecnacimiento) as MAXFECNAC,
+ min(fecnacimiento) as MINFECNAC
+ from Padron
+ group by idubigeo--Campo agrupador
+ order by idubigeo asc
+
+ select idubigeo,estado,count(idpadron) as TOTAL,max(fecnacimiento) as MAXFECNAC,
+ min(fecnacimiento) as MINFECNAC
+ from Padron
+ group by idubigeo,estado--Campos agrupadores
+ order by idubigeo asc
