@@ -236,3 +236,38 @@ order by idubigeo
 
 update Padron set sexo='F' where idpadron=3
 update Padron set sexo='M' where idpadron=203
+
+--02.08
+select idubigeo as UBIGEO,isnull(sexo,'-') as SEXO,count(idpadron) as TOTAL,
+max(ltrim(rtrim(apellidos))) as [MAX-APELLIDOS],min(rtrim(ltrim(apellidos))) as [MIN-APELLIDOS]
+from Padron
+group by idubigeo,sexo --Campos agrupadores
+order by idubigeo
+
+--02.09
+--select count(1) from Padron
+select 
+top (6) --Listar SOLO los 6 primeros con mayor número de ocurrencias
+rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
+from Padron
+group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
+order by NUMERO desc --Ordena de mayor a menor 
+
+select 
+top (6) percent -- Listar SOLO el primer 6% con mayor número de ocurrencias
+rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
+from Padron
+group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
+order by NUMERO desc --Ordena de mayor a menor 
+--02.10
+select top(7) with ties
+rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
+from Padron
+group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
+order by NUMERO desc --Ordena de mayor a menor 
+
+select top(7) percent with ties --Incluir empates con el registro de la última posición del TOP
+rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
+from Padron
+group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
+order by NUMERO desc --Ordena de mayor a menor 
