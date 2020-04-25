@@ -245,7 +245,7 @@ group by idubigeo,sexo --Campos agrupadores
 order by idubigeo
 
 --02.09
---select count(1) from Padron
+
 select 
 top (6) --Listar SOLO los 6 primeros con mayor número de ocurrencias
 rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
@@ -259,7 +259,9 @@ rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
 from Padron
 group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
 order by NUMERO desc --Ordena de mayor a menor 
+
 --02.10
+
 select top(7) with ties
 rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
 from Padron
@@ -271,3 +273,76 @@ rtrim(ltrim(nombres)) as NOMBRES,count(idpadron) as NUMERO
 from Padron
 group by rtrim(ltrim(nombres)) --Campo|expresion agrupadora
 order by NUMERO desc --Ordena de mayor a menor 
+
+--02.11
+
+select TOP 2 idsector as SECTOR,count(idmanzana) as MANZANAS,
+concat('El sector ',idsector,' tiene ',count(idmanzana),' manzanas') as MENSAJE
+from Manzana --Manzanas activas+inactivas
+where estado=1 --Manzanas activas
+group by idsector --Campo agrupador
+order by MANZANAS desc --Ordenado X total de mayor a menor
+
+--02.12
+
+select TOP 2 with ties idsector as SECTOR,count(idmanzana) as MANZANAS,--Mostrar empates de 2° puesto
+concat('El sector ',idsector,' tiene ',count(idmanzana),' manzanas') as MENSAJE
+from Manzana --Manzanas activas+inactivas
+where estado=1 --Manzanas activas
+group by idsector --Campo agrupador
+order by MANZANAS desc --Ordenado X total de mayor a menor
+
+--02.13
+
+--Página 1 y tamaño de página 10
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 0 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 10 rows only --Resultados sgtes. a mostrar [TAM_PAGINA] 
+
+--Página 2 y tamaño de página 10
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 10 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 10 rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
+--Página 3 y tamaño de página 10
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 20 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 10 rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
+--Página 1 y tamaño de página 100
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 0 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 100 rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
+--Página 2 y tamaño de página 100
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 100 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 100 rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
+--Página 3 y tamaño de página 100
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset 200 rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next 100 rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
+--Página n y tamaño de página m
+declare @_n int=10
+declare @_m int=100
+
+select ltrim(nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO from Padron
+where ltrim(nombres)+' '+ltrim(apellidos) <>''
+order by NOMBRE_COMPLETO asc
+offset @_m*(@_n-1) rows --Número de resultados a obviar [TAM_PAGINA]*([NUM_PAGINA]-1)
+fetch next @_m rows only --Resultados sgtes. a mostrar [TAM_PAGINA]
+
