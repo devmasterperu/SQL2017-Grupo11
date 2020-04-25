@@ -211,3 +211,28 @@ select 'TN'=@T1+(@N-1)*@R --salida
  from Padron
  group by idubigeo,estado--Campos agrupadores
  order by idubigeo asc
+
+ --02.06
+select idsector,COUNT(idmanzana) as [TOTAL-M],MAX(idmanzana) as [MAX-ID-M],
+MIN(idmanzana) as [MIN-ID-M]
+from Manzana --Activas+Inactivas
+where estado=1 --Activas
+group by idsector --Campo agrupador
+
+--02.07
+--select distinct sexo from Padron
+select isnull(sexo,'-') as SEXO,idubigeo as UBIGEO,count(idpadron) as TOTAL,
+max(fecnacimiento) as MAXFECNAC,min(fecnacimiento) as MINFECNAC
+from Padron
+group by sexo,idubigeo --Campos agrupadores
+
+update Padron set sexo='M' where idpadron=2
+
+select isnull(sexo,'-') as SEXO,idubigeo as UBIGEO,count(idpadron) as TOTAL,
+max(fecnacimiento) as MAXFECNAC,min(fecnacimiento) as MINFECNAC
+from Padron
+group by sexo,idubigeo --Campos agrupadores
+order by idubigeo
+
+update Padron set sexo='F' where idpadron=3
+update Padron set sexo='M' where idpadron=203
