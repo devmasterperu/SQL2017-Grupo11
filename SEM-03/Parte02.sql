@@ -56,3 +56,13 @@ left join Asignacion a on t.idtrabajador=a.idencuestador
 left join Padron p on t.idpadron = p.idpadron --'NOMBRE COMPLETO' 
 left join Manzana m on a.idmanzana= m.idmanzana --'MANZANA'
 where t.tipo= 'E' and t.estado=1
+
+--03.10
+--Tabla izquierda: Trabajador 
+--Tabla derecha: Asignacion (Prevalece)
+select t.tipo,isnull(t.usuario,'-') as USUARIO,
+case when idpadron is null then '-' else concat('P',idpadron) end as IDPERSONA,
+a.idencuestador as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
+isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
+from Trabajador t right join Asignacion a on t.idtrabajador=a.idencuestador 
+where isnull(t.tipo,'E')='E'
