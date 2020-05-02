@@ -47,3 +47,12 @@ from Trabajador t
 left join Asignacion a on t.idtrabajador=a.idencuestador 
 left join Padron p on t.idpadron=p.idpadron --NOMBRE COMPLETO
 where t.tipo='E' and t.estado=1
+
+--03.09
+select t.usuario as USUARIO,LTRIM(p.nombres)+''+LTRIM(apellidos) as 'NOMBRE COMPLETO',
+isnull(m.nombre,'0000') AS 'MANZANA',ISNULL(fecinicio,'9999-12-31') as FECINICIO, ISNULL(fecfin,'9999-12-31') as FECFIN
+from Trabajador t 
+left join Asignacion a on t.idtrabajador=a.idencuestador 
+left join Padron p on t.idpadron = p.idpadron --'NOMBRE COMPLETO' 
+left join Manzana m on a.idmanzana= m.idmanzana --'MANZANA'
+where t.tipo= 'E' and t.estado=1
