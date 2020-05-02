@@ -31,3 +31,19 @@ from Trabajador t left join Asignacion a on t.idtrabajador=a.idencuestador
 where t.tipo='E' --and a.idmanzana=4
 
 --03.07
+--Manzana left join Asignacion: Lo común+ lo que está en Manzana pero no en Asignación.
+--Asignación left join Manzana: Lo común+ lo que está en Asignación pero no en Manzana.
+
+select m.nombre AS NOMBRE, case when m.estado=1 then 'ACTIVO' ELSE 'INACTIVO' END as ESTADO,
+M.idsector,isnull(a.idencuestador,0) as IDENCUESTADOR
+from Manzana m left join Asignacion a  on a.idmanzana =m.idmanzana
+order by ESTADO ASC
+
+--03.08
+
+select t.usuario as USUARIO,t.idtrabajador as [ID ENCUESTADOR],ltrim(p.nombres)+' '+ltrim(apellidos) as NOMBRE_COMPLETO,
+isnull(a.idmanzana,0) as [ID MANZANA],isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
+from Trabajador t 
+left join Asignacion a on t.idtrabajador=a.idencuestador 
+left join Padron p on t.idpadron=p.idpadron --NOMBRE COMPLETO
+where t.tipo='E' and t.estado=1
