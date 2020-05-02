@@ -68,8 +68,8 @@ from Trabajador t right join Asignacion a on t.idtrabajador=a.idencuestador
 where isnull(t.tipo,'E')='E'
 
 --03.11
-select m.estado,ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
-a.idencuestador as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
+select ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
+isnull(a.idencuestador,0) as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
 isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
 from Manzana m right join Asignacion a on m.idmanzana=a.idmanzana
 where isnull(m.estado,1)=1
@@ -81,12 +81,12 @@ isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFI
 from Manzana m full outer join Asignacion a on m.idmanzana=a.idmanzana
 
 --LEFT+RIGHT JOIN+UNION
-select m.estado,ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
-a.idencuestador as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
+select ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
+isnull(a.idencuestador,0) as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
 isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
 from Manzana m left join Asignacion a on m.idmanzana=a.idmanzana
 union
-select m.estado,ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
-a.idencuestador as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
+select ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR', 
+isnull(a.idencuestador,0) as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
 isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
 from Manzana m right join Asignacion a on m.idmanzana=a.idmanzana
