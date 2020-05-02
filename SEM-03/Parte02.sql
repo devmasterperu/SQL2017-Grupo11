@@ -90,3 +90,24 @@ select ISNULL(m.nombre,'-') as 'MANZANA',isnull(m.idsector,'0') as 'ID SECTOR',
 isnull(a.idencuestador,0) as [ID ENCUESTADOR],isnull(a.idmanzana,0) as [ID MANZANA],
 isnull(fecinicio,'9999-12-31') as FECINICIO,isnull(fecfin,'9999-12-31') as FECFIN
 from Manzana m right join Asignacion a on m.idmanzana=a.idmanzana
+
+--03.13
+--Página n y tamaño de página m
+declare @_n int=5
+declare @_m int=8
+
+select isnull(ltrim(p.nombres)+' '+ltrim(p.apellidos),'') as ENCUESTADOR,
+isnull(m.nombre,'') as MANZANA,isnull(ltrim(ps.nombres)+' '+ltrim(ps.apellidos),'') as SUPERVISOR,
+@_n as PAGINA
+from Asignacion a
+--ENCUESTADOR
+inner join Trabajador t on a.idencuestador=t.idtrabajador
+inner join Padron p on t.idpadron=p.idpadron
+--MANZANA
+inner join Manzana m on a.idmanzana=m.idmanzana
+--SUPERVISOR
+inner join Trabajador ts on a.idencuestador=ts.idtrabajador
+inner join Padron ps on ts.idpadron=ps.idpadron
+order by ENCUESTADOR asc, MANZANA asc
+offset @_m*(@_n-1) rows 
+fetch next @_m rows only 
