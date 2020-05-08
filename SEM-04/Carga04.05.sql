@@ -1,4 +1,7 @@
 --Carga 04.05
+
+--Carga de tabla ORIGEN
+
 insert into [ServiciosG11BD-2].dbo.ficha(idcliente, manzana, tipoconsumidor, numhabitantes,
 coordenadax, coordenaday, idencuestador, montopago,estado)
 values
@@ -103,4 +106,18 @@ values
 (392,'0009','GRAN CONSUMIDOR',4,'-11.1050724549347','-77.5916774273775',11,100,'A'),
 (241,'0011','GRAN CONSUMIDOR',1,'-11.0923575680998','-77.5937602205845',36,65,'A')
 
-select * from [ServiciosG11BD-2].dbo.ficha
+--Carga de tabla DESTINO
+
+create table insertados (idficha int) --Tabla de inserciones.
+
+insert into [ServiciosG11BD].dbo.Ficha(idcliente,idmanzana, tipoconsumidor, numhabitantes, coordenadax, 
+coordenaday,idencuestador, montopago,estado)
+output inserted.idficha into insertados
+select idcliente,m.idmanzana,substring(tipoconsumidor,1,1) as tipoconsumidor, numhabitantes, coordenadax, 
+coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.ficha f
+inner join [ServiciosG11BD].dbo.Manzana m on f.manzana=m.nombre
+
+/*OPCIONAL: RESETEO IDS
+delete from Ficha where idficha>699
+DBCC CHECKIDENT ('Ficha', RESEED,699) --Resetear el idficha a 109
+*/
