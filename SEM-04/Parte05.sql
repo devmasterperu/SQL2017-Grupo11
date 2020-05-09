@@ -45,3 +45,46 @@ BEGIN TRAN --INICIO TRANSACCION
 ROLLBACK   --REVERSA TRANSACCION
 
 select idunidaduso from ueliminado
+
+--04.12
+
+select a.idencuestador,t.idtrabajador,p.idpadron,u.nom_dto
+from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+where u.nom_dto= 'HUACHO'
+
+create table eliminadosA
+(
+idmanzana int,idencuestador int,fecinicio date
+)
+
+BEGIN TRAN
+	delete top(10) a
+	output deleted.idmanzana, deleted.idencuestador,deleted.fecinicio into eliminadosA /*OPCIONAL*/
+	from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+	Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+	where u.nom_dto= 'HUACHO'
+ROLLBACK
+
+select idmanzana,idencuestador,fecinicio from eliminadosA
+
+--04.13
+select * from Padron where idpadron=101
+
+create table actualizadoP
+(
+idpadron int,
+direccion_ant varchar(200),
+direccion_nueva varchar(200),
+fecnacimiento_ant date,
+fecnacimiento_nueva date,
+)
+BEGIN TRAN
+	update Padron
+	set    idubigeo=3,direccion='URB. LOS CIPRESES M-24',numdoc='22064382', sexo='F',fecnacimiento='1969-04-10'
+	output deleted.idpadron,deleted.direccion,inserted.direccion,deleted.fecnacimiento,inserted.fecnacimiento
+	into   actualizadoP
+	where  idpadron=101
+ROLLBACK
+
+select * from actualizadoP
