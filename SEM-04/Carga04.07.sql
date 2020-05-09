@@ -1,4 +1,5 @@
 --Carga 04.07
+--a
 insert into [ServiciosG11BD-2].dbo.Ficha3(idcliente,idmanzana,tipoconsumidor,numhabitantes,coordenadax,
 coordenaday,idencuestador,montopago,estado)
 SELECT 911,12,'M',1,'-11.0845666093794','-77.5933909716589',23,99,'A' UNION ALL
@@ -100,3 +101,20 @@ SELECT 83,16,'M',1,'-11.1194841541884','-77.5897914423915',30,84,'A' UNION ALL
 SELECT 407,12,'P',4,'-11.0992074777048','-77.5908939796115',41,50,'A' UNION ALL
 SELECT 852,3,'G',5,'-11.078666523112','-77.5893029125476',24,71,'A' UNION ALL
 SELECT 257,14,'M',4,'-11.0520271593854','-77.593833719313',39,72,'A' 
+
+--b
+--create procedure dbo.USP_SelFicha3 as --Crear procedimiento
+alter procedure dbo.USP_SelFicha3 as --Modificar procedimiento
+begin
+	select idcliente,idmanzana,tipoconsumidor, numhabitantes, coordenadax, 
+	coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.Ficha3 f
+	order by montopago desc
+end
+
+execute dbo.USP_SelFicha3
+
+insert TOP(50) into ServiciosG11BD.dbo.Ficha(idcliente, idmanzana, tipoconsumidor,numhabitantes, coordenadax, coordenaday, 
+idencuestador,montopago,estado)
+execute ServiciosG11BD.dbo.USP_SelFicha3
+
+select * from Ficha order by idficha asc
