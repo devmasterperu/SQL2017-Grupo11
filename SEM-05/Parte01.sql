@@ -46,3 +46,25 @@ SELECT --CE
 	from Trabajador t inner join Padron p on t.idpadron=p.idpadron --CE
 	where t.tipo='E'
 
+--05.04
+
+SELECT M.nombre AS MANZANA,
+(select count(idficha) from Ficha f where f.idmanzana=M.idmanzana) as TOTAL,
+case 
+	when (select count(idficha) from Ficha where idmanzana=M.idmanzana) between 1 and 59 then 'Manzana con poco recorrido.'
+	when (select count(idficha) from Ficha where idmanzana=M.idmanzana)  between 60 and 99 then 'Manzana medianamente recorrida.'
+	when (select count(idficha) from Ficha where idmanzana=M.idmanzana) >=100 then 'Manzana con gran recorrido.'
+	else 'Sin recorrido.' end as MENSAJE
+from Manzana M
+
+--05.05
+
+	select  t.usuario as USUARIO,
+			(select count(idficha) from Ficha where idencuestador=t.idtrabajador) as TOTAL_U, --CI
+			(select count(idficha) from Ficha) as TOTAL,--CI
+			concat(cast(round((select count(idficha) from Ficha where idencuestador=t.idtrabajador)*100.00/(select count(idficha) from Ficha),3) as decimal(4,3)),'%')
+			as PORCENTAJE
+	from Trabajador t --CE
+	where t.tipo='E'
+
+	select cast(round(100.2345,1) as decimal(5,2)),round(100.2345,2), round(100.2345,3)
