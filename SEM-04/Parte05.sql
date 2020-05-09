@@ -113,3 +113,20 @@ BEGIN TRAN
 ROLLBACK
 
 select * from actualizadoA
+
+--04.14
+--Calculo COSTO
+BEGIN TRAN
+	UPDATE Ficha SET costo=10+numhabitantes*20
+ROLLBACK
+
+select idficha,numhabitantes,costo from Ficha --costo=10+numhabitantes*20
+
+select ltrim(p.nombres)+' '+ltrim(p.apellidos) as [NOMBRE COMPLETO],f.montopago as MONTO_PAGO,
+f.costo as COSTO_CALCULADO, 
+case 
+when f.montopago>f.costo then 'Cliente genera ganancia' 
+when f.montopago<f.costo then 'Cliente genera pérdida' 
+else '-' end as MENSAJE
+from Ficha f inner join Cliente c on f.idcliente=c.idcliente
+inner join Padron p on c.idpadron=p.idpadron
