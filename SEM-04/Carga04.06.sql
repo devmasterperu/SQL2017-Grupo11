@@ -1,4 +1,5 @@
 --Carga 04.02
+--a
 insert into [ServiciosG11BD-2].dbo.Ficha2(idcliente, manzana, tipoconsumidor, numhabitantes,
 coordenadax, coordenaday, idencuestador, montopago,estado)
 values
@@ -103,3 +104,19 @@ values
 (697,'0012','MEDIANO CONSUMIDOR',2,'-11.0225951676384','-77.5892489982992',34,68,'A'),
 (586,'0004','PEQUEÑO CONSUMIDOR',5,'-11.0659565126026','-77.5971191426244',25,60,'A'),
 (327,'0009','GRAN CONSUMIDOR',2,'-11.0609771125121','-77.5960841998744',31,84,'A')
+
+--b
+create procedure USP_SelFichas2 
+as
+begin
+	select idcliente,m.idmanzana,substring(tipoconsumidor,1,1) as tipoconsumidor, numhabitantes, coordenadax, 
+	coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.Ficha2 f
+	inner join [ServiciosG11BD].dbo.Manzana m on f.manzana=m.nombre
+end
+
+	insert into ServiciosG11BD.dbo.Ficha(idcliente, idmanzana, tipoconsumidor,numhabitantes, coordenadax, coordenaday, 
+	idencuestador,montopago,estado)
+	--select idcliente,m.idmanzana,substring(tipoconsumidor,1,1) as tipoconsumidor, numhabitantes, coordenadax, 
+	--coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.Ficha2 f
+	--inner join [ServiciosG11BD].dbo.Manzana m on f.manzana=m.nombre
+	execute ServiciosG11BD.dbo.USP_SelFichas2
