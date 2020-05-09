@@ -111,8 +111,10 @@ begin
 	order by montopago desc
 end
 
+--Validar procedimiento
 execute dbo.USP_SelFicha3
 
+--Insertar solo los primeros 50 ordenado por monto de pago de mayor a menor
 insert TOP(50) into ServiciosG11BD.dbo.Ficha(idcliente, idmanzana, tipoconsumidor,numhabitantes, coordenadax, coordenaday, 
 idencuestador,montopago,estado)
 execute ServiciosG11BD.dbo.USP_SelFicha3
