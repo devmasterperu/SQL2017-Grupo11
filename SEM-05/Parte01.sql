@@ -32,16 +32,17 @@ SELECT --CE
 
 --05.03
 
-select  t.usuario,t.idtrabajador,
-		upper(ltrim(p.nombres)) as NOMBRES_MA, 
-		upper(ltrim(p.apellidos)) as APELLIDOS_MA,
-		replace(lower(rtrim(ltrim(p.nombres))),' ','_') as NOMBRES_MI, 
-		replace(lower(rtrim(ltrim(p.apellidos))),' ','_') as APELLIDOS_MI,
-		(select count(idficha) from Ficha where idencuestador=t.idtrabajador) as TOTAL, --CI
-		case 
-		when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) between 1 and 19 then 'Baja productividad'
-		when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) between 20 and 29 then 'Mediana productividad'
-		when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) >=30 then 'Alta productividad'
-		else 'Sin fichas' end as MENSAJE
-from Trabajador t inner join Padron p on t.idpadron=p.idpadron --CE
-where t.tipo='E'
+	select  t.usuario,t.idtrabajador,
+			upper(ltrim(p.nombres)) as NOMBRES_MA, 
+			upper(ltrim(p.apellidos)) as APELLIDOS_MA,
+			replace(lower(rtrim(ltrim(p.nombres))),' ','_') as NOMBRES_MI, 
+			replace(lower(rtrim(ltrim(p.apellidos))),' ','_') as APELLIDOS_MI,
+			(select count(idficha) from Ficha where idencuestador=t.idtrabajador) as TOTAL, --CI
+			case 
+			when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) between 1 and 19 then 'Baja productividad'
+			when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) between 20 and 29 then 'Mediana productividad'
+			when (select count(idficha) from Ficha where idencuestador=t.idtrabajador) >=30 then 'Alta productividad'
+			else 'Sin fichas' end as MENSAJE
+	from Trabajador t inner join Padron p on t.idpadron=p.idpadron --CE
+	where t.tipo='E'
+
