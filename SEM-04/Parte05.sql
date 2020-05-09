@@ -69,6 +69,7 @@ ROLLBACK
 select idmanzana,idencuestador,fecinicio from eliminadosA
 
 --04.13
+--a
 select * from Padron where idpadron=101
 
 create table actualizadoP
@@ -88,3 +89,27 @@ BEGIN TRAN
 ROLLBACK
 
 select * from actualizadoP
+
+--b
+
+create table actualizadoA
+(
+idmanzana int,
+idencuestador int,
+fecinicio datetime,
+fecinicioa datetime,
+fecfin datetime,
+fecfina datetime,
+idsupervisor int,
+idsupervisora int
+)
+
+BEGIN TRAN
+	update Asignacion
+	set    fecinicio='2020-02-01',fecfin='2020-12-31',idsupervisor='5'
+	output deleted.idmanzana,deleted.idencuestador,inserted.fecinicio,deleted.fecinicio,inserted.fecfin,deleted.fecfin,
+		   inserted.idsupervisor,deleted.idsupervisor into actualizadoA
+	where  idencuestador=23 and idmanzana=7
+ROLLBACK
+
+select * from actualizadoA
