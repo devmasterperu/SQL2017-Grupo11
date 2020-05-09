@@ -109,9 +109,9 @@ values
 create procedure USP_SelFichas2 
 as
 begin
-	select idcliente,m.idmanzana,substring(tipoconsumidor,1,1) as tipoconsumidor, numhabitantes, coordenadax, 
-	coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.Ficha2 f
-	inner join [ServiciosG11BD].dbo.Manzana m on f.manzana=m.nombre
+select idcliente,m.idmanzana,substring(tipoconsumidor,1,1) as tipoconsumidor, numhabitantes, coordenadax, 
+coordenaday,idencuestador, montopago,f.estado from [ServiciosG11BD-2].dbo.Ficha2 f
+inner join [ServiciosG11BD].dbo.Manzana m on f.manzana=m.nombre
 end
 
 	insert into ServiciosG11BD.dbo.Ficha(idcliente, idmanzana, tipoconsumidor,numhabitantes, coordenadax, coordenaday, 
