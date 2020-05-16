@@ -235,6 +235,7 @@ where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.i
 				group by idencuestador
 			) re
 	   ) 
+
 --CTE
 
 WITH 
@@ -301,3 +302,19 @@ select * from dbo.F_REPORTE_ENCUESTADOR()
 --05.13
 
 select GETUTCDATE()
+
+--05.14
+
+--Trabajadores que tienen fichas
+select usuario,contrasena,estado,eomonth(getdate()) as cierre
+from Trabajador t
+where exists (select idficha from Ficha f where f.idencuestador=t.idtrabajador)
+
+--Trabajadores que tienen asignación
+select * from Trabajador t
+where idtrabajador in (select distinct idencuestador from Asignacion)
+
+--Trabajadores que no tiene asignación
+select * from Trabajador t
+where idtrabajador not in (select distinct idencuestador from Asignacion)
+
