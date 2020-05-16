@@ -195,3 +195,109 @@ from Ficha f inner join Cliente c on f.idcliente=c.idcliente
 inner join Padron p on c.idpadron=p.idpadron
 where f.montopago>(select AVG(montopago) from Ficha)
 order by CLIENTE,MTOPAGO DESC
+
+--05.11
+
+SELECT f.tipoconsumidor, LTRIM(nombres)+' '+LTRIM(apellidos) as CLIENTE,f.costo as COSTO,
+CAST(ROUND((SELECT AVG(costo) from Ficha),2)AS DECIMAL (4,2)) AS COSTO_PROM
+FROM Ficha f inner join Cliente c on f.idcliente=c.idcliente 
+inner join  Padron p on c.idpadron=p.idpadron
+where f.costo< (SELECT AVG(costo) from Ficha)   
+order by CLIENTE, COSTO  DESC
+
+--05.12
+
+--SUBCONSULTAS
+select avg(total) from
+(
+	select idencuestador,count(idficha) as total
+	from Ficha 
+	group by idencuestador
+) re
+
+select idtrabajador as [ID ENCUESTADOR],
+	   (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador) as [TOTAL_FICHAS],
+	   (
+			select avg(total) from
+			(
+				select idencuestador,count(idficha) as total
+				from Ficha 
+				group by idencuestador
+			) re
+	   ) as TOTAL_PROM
+from Trabajador t
+where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador)>
+	  (
+			select avg(total) from
+			(
+				select idencuestador,count(idficha) as total
+				from Ficha 
+				group by idencuestador
+			) re
+	   ) 
+--CTE
+
+WITH 
+CTE_RE AS (select idencuestador,count(idficha) as total from Ficha group by idencuestador)
+select idtrabajador as [ID ENCUESTADOR],
+	   (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador) as [TOTAL_FICHAS],
+	   (select avg(total) from CTE_RE) as TOTAL_PROM
+from Trabajador t
+where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador)>
+	  (select avg(total) from CTE_RE) 
+
+--VISTAS
+CREATE VIEW dbo.V_REPORTE_ENCUESTADOR AS
+ALTER VIEW dbo.V_REPORTE_ENCUESTADOR AS
+DROP  VIEW dbo.V_REPORTE_ENCUESTADOR 
+WITH 
+CTE_RE AS (select idencuestador,count(idficha) as total from Ficha group by idencuestador)
+select idtrabajador as [ID ENCUESTADOR],
+	   (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador) as [TOTAL_FICHAS],
+	   (select avg(total) from CTE_RE) as TOTAL_PROM,t.estado
+from Trabajador t
+where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador)>
+	  (select avg(total) from CTE_RE) 
+
+select ve.[ID ENCUESTADOR],t.usuario,ve.TOTAL_FICHAS,ve.TOTAL_PROM,ve.estado
+from dbo.V_REPORTE_ENCUESTADOR ve
+left join Trabajador t on ve.[ID ENCUESTADOR]=t.idtrabajador
+
+--FUNCIONES_VALOR_TABLA
+
+CREATE FUNCTION dbo.F_TOTAL_FICHAS(@idtrabajador int) returns table as
+return 
+	select count(idficha) as total 
+	from Ficha f 
+	where f.idencuestador=@idtrabajador
+
+select * from F_TOTAL_FICHAS(20)
+
+CREATE VIEW dbo.V_REPORTE_ENCUESTADOR_2 AS
+WITH 
+CTE_RE AS (select idencuestador,count(idficha) as total from Ficha group by idencuestador)
+select idtrabajador as [ID ENCUESTADOR],
+	   (select total from F_TOTAL_FICHAS(t.idtrabajador)) as [TOTAL_FICHAS],
+	   (select avg(total) from CTE_RE) as TOTAL_PROM,t.estado
+from Trabajador t
+where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador)>
+	  (select avg(total) from CTE_RE) 
+
+select * from dbo.V_REPORTE_ENCUESTADOR_2
+
+CREATE FUNCTION dbo.F_REPORTE_ENCUESTADOR() returns table as
+return 
+	WITH 
+	CTE_RE AS (select idencuestador,count(idficha) as total from Ficha group by idencuestador)
+	select idtrabajador as [ID ENCUESTADOR],
+		   (select total from F_TOTAL_FICHAS(t.idtrabajador)) as [TOTAL_FICHAS],
+		   (select avg(total) from CTE_RE) as TOTAL_PROM,t.estado
+	from Trabajador t
+	where tipo='E' and (select count(idficha) from Ficha f where f.idencuestador=t.idtrabajador)>
+		  (select avg(total) from CTE_RE) 
+
+select * from dbo.F_REPORTE_ENCUESTADOR()
+
+--05.13
+
+select GETUTCDATE()
