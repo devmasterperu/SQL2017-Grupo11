@@ -184,3 +184,14 @@ select m.idmanzana as ID,
 from Manzana m
 left join CTE_RM as rm on m.idmanzana=rm.idmanzana
 left join CTE_RA as ra on m.idmanzana=ra.idmanzana
+
+--05.10
+--MTOPAGO_PROM
+select AVG(montopago) from Ficha--75.78
+
+select f.tipoconsumidor,ltrim(nombres)+' '+ltrim(apellidos) as CLIENTE,f.montopago as MTOPAGO,
+       cast(round((select AVG(montopago) from Ficha),2) as decimal(5,2)) as MTOPAGO_PROM
+from Ficha f inner join Cliente c on f.idcliente=c.idcliente
+inner join Padron p on c.idpadron=p.idpadron
+where f.montopago>(select AVG(montopago) from Ficha)
+order by CLIENTE,MTOPAGO DESC
