@@ -146,3 +146,41 @@ from Manzana M
   from Ubigeo u
   left join CTE_RU ru on u.idubigeo=ru.idubigeo
   left join CTE_RU ru2 on u.idubigeo=ru2.idubigeo
+
+--05.09
+
+--TABLA_DERIVADA
+select m.idmanzana as ID,
+       m.nombre as MANZANA,
+       (select count(idficha) from Ficha) as TOTAL_FICHAS,
+	   isnull(rm.total,0) as TOTAL_FICHAS_MZA,
+	   (select count(1) from Asignacion) as TOTAL_ASIGNA,
+	   isnull(ra.total,0) as TOTAL_ASIGNA_MZA
+from Manzana m
+left join
+(
+select idmanzana,count(idficha) as total from Ficha
+group by idmanzana	
+) rm on m.idmanzana=rm.idmanzana
+left join 
+(
+select idmanzana,count(1) as total from Asignacion
+group by idmanzana	
+) ra on m.idmanzana=ra.idmanzana
+
+--CTE
+WITH 
+CTE_RM AS (select idmanzana,count(idficha) as total from Ficha group by idmanzana),/*INNER_QUERY*/
+CTE_RA AS (select idmanzana,count(1) as total from Asignacion group by idmanzana)/*INNER_QUERY*/
+/*OUTER_QUERY*/
+select m.idmanzana as ID,
+       m.nombre as MANZANA,
+       --(select count(idficha) from Ficha) as TOTAL_FICHAS,
+	   (select sum(total) from CTE_RM) as TOTAL_FICHAS,
+	   isnull(rm.total,0) as TOTAL_FICHAS_MZA,
+	   --(select count(1) from Asignacion) as TOTAL_ASIGNA,
+	   (select sum(total) from CTE_RA) as TOTAL_ASIGNA,
+	   isnull(ra.total,0) as TOTAL_ASIGNA_MZA
+from Manzana m
+left join CTE_RM as rm on m.idmanzana=rm.idmanzana
+left join CTE_RA as ra on m.idmanzana=ra.idmanzana
