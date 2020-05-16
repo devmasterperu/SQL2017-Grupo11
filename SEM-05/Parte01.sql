@@ -68,3 +68,81 @@ from Manzana M
 	where t.tipo='E'
 
 	select cast(round(100.2345,1) as decimal(5,2)),round(100.2345,2), round(100.2345,3)
+
+--05.06
+	SELECT M.nombre AS MANZANA,
+		   (select count(idficha) from Ficha f where f.idmanzana=M.idmanzana) as TOTAL_M,
+		   (select COUNT(idficha) from Ficha f) as TOTAL,
+		   concat(CAST(ROUND((select count(idficha) from Ficha f where f.idmanzana=M.idmanzana)*100.00/(select COUNT(idficha) from Ficha f),2) as decimal  (4,2)),'%') AS PORCENTAJE
+	from Manzana M
+	order by TOTAL_M desc
+
+--05.07
+--FORMA_01
+	SELECT M.idmanzana as ID,
+		   M.nombre AS MANZANA,
+		   isnull((select count(idficha) from Ficha f where f.idmanzana=M.idmanzana),0) as TOTAL_FICHAS,
+		   isnull((select max(montopago) from Ficha f where f.idmanzana=M.idmanzana),0) as MAXIMO_MTOPAGO,
+		   isnull((select min(montopago) from Ficha f where f.idmanzana=M.idmanzana),0) as MINIMO_MTOPAGO,
+		   cast(round(isnull((select avg(montopago) from Ficha f where f.idmanzana=M.idmanzana),0),2) as decimal(5,2)) as PROMEDIO_MTOPAGO
+	from Manzana M
+
+--FORMA_02
+	select m.idmanzana as ID,
+		   m.nombre as MANZANA,
+		   isnull(rm.TOTAL_FICHAS,0) as TOTAL_FICHAS,
+		   isnull(rm.MAXIMO_MTOPAGO,0) as MAXIMO_MTOPAGO,
+		   isnull(rm.MINIMO_MTOPAGO,0) as MINIMO_MTOPAGO,
+		   cast(round(isnull(rm.PROMEDIO_MTOPAGO,0),2) as decimal(5,2)) as PROMEDIO_MTOPAGO
+	from Manzana m
+	left join
+	(
+		select idmanzana,count(idficha) as TOTAL_FICHAS,max(montopago) as MAXIMO_MTOPAGO,
+			   min(montopago) as MINIMO_MTOPAGO,avg(montopago) as PROMEDIO_MTOPAGO
+		from Ficha  
+		group by idmanzana
+    )   rm on m.idmanzana=rm.idmanzana
+
+--05.08
+
+--TABLA_DERIVADA
+  select 
+  nom_dpto as DPTO,
+  nom_prov as PROV,
+  nom_dto as DTO,
+  ru.TOTAL as TOTAL,
+  ru.FNACIMIENTO,
+  ru.DIA_NACIMIENTO,
+  ru.MES_NACIMIENTO,
+  ru.AÑO_NACIMIENTO
+  from Ubigeo u
+  left join
+  (
+	select idubigeo,count(idpadron) as TOTAL,max(fecnacimiento) as FNACIMIENTO,
+	       DAY(max(fecnacimiento)) as DIA_NACIMIENTO,
+		   MONTH(max(fecnacimiento)) as MES_NACIMIENTO,
+		   YEAR(max(fecnacimiento)) as AÑO_NACIMIENTO
+	from Padron
+	where idtipo=1
+	group by idubigeo
+  ) ru on u.idubigeo=ru.idubigeo
+
+--CTE
+  WITH CTE_RU /*CTE_NAME*/
+  AS
+  ( /*INNER_QUERY*/
+	select idubigeo,count(idpadron) as TOTAL,max(fecnacimiento) as FNACIMIENTO,
+	       DAY(max(fecnacimiento)) as DIA_NACIMIENTO,
+		   MONTH(max(fecnacimiento)) as MES_NACIMIENTO,
+		   YEAR(max(fecnacimiento)) as AÑO_NACIMIENTO
+	from Padron
+	where idtipo=1
+	group by idubigeo
+  )/*OUTER_QUERY*/
+  select 
+  nom_dpto as DPTO,nom_prov as PROV,nom_dto as DTO,
+  ru.TOTAL as TOTAL,ru.FNACIMIENTO,ru.DIA_NACIMIENTO,ru.MES_NACIMIENTO,ru.AÑO_NACIMIENTO,
+  ru2.TOTAL as TOTAL,ru2.FNACIMIENTO,ru2.DIA_NACIMIENTO,ru2.MES_NACIMIENTO,ru2.AÑO_NACIMIENTO
+  from Ubigeo u
+  left join CTE_RU ru on u.idubigeo=ru.idubigeo
+  left join CTE_RU ru2 on u.idubigeo=ru2.idubigeo
