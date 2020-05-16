@@ -318,3 +318,36 @@ where idtrabajador in (select distinct idencuestador from Asignacion)
 select * from Trabajador t
 where idtrabajador not in (select distinct idencuestador from Asignacion)
 
+--TABLAS_TEMPORALES
+
+if object_id('tempdb.dbo.##CTE_RM') is not null
+begin
+	drop table tempdb.dbo.##CTE_RM
+end
+
+select idmanzana,count(idficha) as total 
+into tempdb.dbo.##CTE_RM
+from Ficha 
+group by idmanzana
+
+if object_id('tempdb.dbo.##CTE_RA') is not null
+begin
+	drop table tempdb.dbo.##CTE_RA
+end
+
+select idmanzana,count(1) as total 
+into tempdb.dbo.##CTE_RA
+from Asignacion 
+group by idmanzana
+
+select m.idmanzana as ID,
+       m.nombre as MANZANA,
+       --(select count(idficha) from Ficha) as TOTAL_FICHAS,
+	   (select sum(total) from tempdb.dbo.##CTE_RM) as TOTAL_FICHAS,
+	   isnull(rm.total,0) as TOTAL_FICHAS_MZA,
+	   --(select count(1) from Asignacion) as TOTAL_ASIGNA,
+	   (select sum(total) from tempdb.dbo.##CTE_RA) as TOTAL_ASIGNA,
+	   isnull(ra.total,0) as TOTAL_ASIGNA_MZA
+from Manzana m
+left join tempdb.dbo.##CTE_RM as rm on m.idmanzana=rm.idmanzana
+left join tempdb.dbo.##CTE_RA as ra on m.idmanzana=ra.idmanzana
