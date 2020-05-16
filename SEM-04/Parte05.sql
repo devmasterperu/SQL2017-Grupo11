@@ -130,3 +130,94 @@ when f.montopago<f.costo then 'Cliente genera pérdida'
 else '-' end as MENSAJE
 from Ficha f inner join Cliente c on f.idcliente=c.idcliente
 inner join Padron p on c.idpadron=p.idpadron
+
+--04.15
+--Cálculo costo
+	BEGIN TRAN
+	UPDATE Ficha SET costo= case when tipoconsumidor = 'P' then 10+numhabitantes*20--10.00+ N° Habitantes * 20.00
+								 when tipoconsumidor = 'M' then 15+numhabitantes*25--15.00+ N° Habitantes * 25.00
+								 when tipoconsumidor = 'G' then 20+numhabitantes*30--20.00+ N° Habitantes * 30.00
+							end
+	ROLLBACK
+
+	select ltrim(p.nombres)+' '+ltrim(p.apellidos) as [NOMBRE COMPLETO],f.tipoconsumidor as 'TIPO_CONSUMIDOR',f.numhabitantes as 'N° HABITANTES',f.montopago as MONTO_PAGO,
+	f.costo as COSTO_CALCULADO, 
+	case 
+	when f.montopago>f.costo then 'Cliente genera ganancia' 
+	when f.montopago<f.costo then 'Cliente genera pérdida' 
+	else '-' end as MENSAJE
+	from Ficha f inner join Cliente c on f.idcliente=c.idcliente
+	inner join Padron p on c.idpadron=p.idpadron
+	ORDER BY  ltrim(p.nombres)+' '+ltrim(p.apellidos) ASC
+
+--04.16
+
+	select a.idencuestador,t.idtrabajador,p.idpadron,u.nom_dto
+	from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+	Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+	where u.nom_dto= 'SAYAN'
+
+	select * from Padron where idpadron between 21 and 24
+	select * from Ubigeo where idubigeo=11
+
+	begin tran
+	update Padron set idubigeo=11 where idpadron between 21 and 24
+	rollback
+
+	create table AsignacionEncuestadorSAYAN
+	(
+	idencuestador int,
+	idmanzana int,
+	fecinicio_ant date,
+	fecinicio_nueva date,
+	)
+
+	BEGIN TRAN
+		update Asignacion
+		set fecinicio= '2020-02-02'
+		output deleted.idencuestador,deleted.idmanzana,deleted.fecinicio,inserted.fecinicio
+		into AsignacionEncuestadorSAYAN
+		from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+		Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+		where u.nom_dto= 'SAYAN'
+	ROLLBACK
+
+	select a.idencuestador,t.idtrabajador,p.idpadron,u.nom_dto
+	from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+	Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+	where u.nom_dto= 'SAYAN'
+
+--04.17
+	select * from Padron where idpadron between 21 and 24
+	select * from Ubigeo where idubigeo=10
+
+	begin tran
+	update Padron set idubigeo=10 where idpadron between 21 and 24
+	rollback
+
+	select a.idencuestador,t.idtrabajador,p.idpadron,u.nom_dto
+	from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+	Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+	where u.nom_dto= 'SANTA MARÍA'
+
+create table AsignacionEncuestadorSantaMaria
+(
+idencuestador int,
+idmanzana int,
+fecfin_ant date,
+fecfin_nueva date,
+)
+
+BEGIN TRAN
+	update Asignacion
+	set fecinicio= '2020-12-31'
+	output deleted.idencuestador,deleted.idmanzana,deleted.fecinicio,inserted.fecinicio
+	into AsignacionEncuestadorSantaMaria
+	from Asignacion a inner join Trabajador t on a.idencuestador=t.idtrabajador inner join
+	Padron p on t.idpadron=p.idpadron inner join Ubigeo u on p.idubigeo=u.idubigeo
+	where u.nom_dto= 'SANTA MARÍA'
+ROLLBACK
+
+select * from AsignacionEncuestadorSantaMaria
+
+
