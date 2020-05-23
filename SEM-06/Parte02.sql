@@ -63,12 +63,17 @@ ROW_NUMBER() OVER(ORDER BY f.numhabitantes ASC) as RN0
 from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
 order by f.numhabitantes ASC
 
-select m.nombre as MANZANA,
-f.idficha as IDFICHA,
-f.numhabitantes as NHABITANTES,
-ROW_NUMBER() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RN1,
-RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RK,
-DENSE_RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as DRK,
-NTILE(4) OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as NTILE4
-from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
-order by m.nombre asc, f.numhabitantes ASC
+alter function F_DETALLE_MANZANA(@idmanzana int) returns table as
+return
+	select m.nombre as MANZANA,
+	f.idficha as IDFICHA,
+	f.numhabitantes as NHABITANTES,
+	ROW_NUMBER() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RN1,
+	RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RK,
+	DENSE_RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as DRK,
+	NTILE(4) OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as NTILE4
+	from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
+	where f.idmanzana=case when @idmanzana=0 then f.idmanzana else @idmanzana end
+	--order by m.nombre asc, f.numhabitantes ASC
+
+	select * from F_DETALLE_MANZANA(0)
