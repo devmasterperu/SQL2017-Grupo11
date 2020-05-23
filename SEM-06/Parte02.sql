@@ -37,3 +37,38 @@ from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
 
 select * from F_REPORTE_MANZANA()
 order by [NOM MZA] desc
+
+--06.04
+CREATE VIEW V_REPORTE_ENC
+as
+select f.idficha as [ID FICHA],
+f.montopago as [MTO PAGO],
+LTRIM(P.nombres)+' '+ LTRIM(p.apellidos) as [NOM ENC],
+count(idficha) OVER(PARTITION BY f.idencuestador) as E_NUM_FICHAS,
+sum(montopago) OVER(PARTITION BY f.idencuestador) as E_TOT_MONTOPAGO,
+max(montopago) OVER(PARTITION BY f.idencuestador) as E_MAX_MTOPAGO,
+min(montopago) OVER(PARTITION BY f.idencuestador) as E_MIN_MTOPAGO,
+avg(montopago) OVER(PARTITION BY f.idencuestador) as E_PROM_MTOPAGO
+from Ficha f inner join Trabajador t on f.idencuestador=t.idtrabajador 
+inner join Padron p on t.idpadron=p.idpadron	
+
+select * from V_REPORTE_ENC
+order by [NOM ENC]
+
+--06.05
+select m.nombre as MANZANA,
+f.idficha as IDFICHA,
+f.numhabitantes as NHABITANTES,
+ROW_NUMBER() OVER(ORDER BY f.numhabitantes ASC) as RN0
+from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
+order by f.numhabitantes ASC
+
+select m.nombre as MANZANA,
+f.idficha as IDFICHA,
+f.numhabitantes as NHABITANTES,
+ROW_NUMBER() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RN1,
+RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as RK,
+DENSE_RANK() OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as DRK,
+NTILE(4) OVER(PARTITION BY m.idmanzana ORDER BY f.numhabitantes ASC) as NTILE4
+from Ficha f left join Manzana m on f.idmanzana=m.idmanzana
+order by m.nombre asc, f.numhabitantes ASC
