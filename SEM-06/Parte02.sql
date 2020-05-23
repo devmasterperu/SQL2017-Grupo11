@@ -113,3 +113,23 @@ where m.idsector=case when @idsector=0 then m.idsector else @idsector end
 
 select * from F_REPORTE_MANZANA_R(0)
 order by [ID SECTOR],TOTAL desc
+
+--06.09
+CREATE VIEW dbo.V_PADRON AS
+WITH CTE_RP AS
+(
+	select idubigeo as IDUBIGEO,SUBSTRING(ltrim(nombres),1,1) as INICIAL,count(idpadron) as TOTAL from Padron
+	group by idubigeo,SUBSTRING(ltrim(nombres),1,1)
+	having SUBSTRING(ltrim(nombres),1,1)<>''
+	--order by idubigeo,SUBSTRING(ltrim(nombres),1,1)
+)
+select 
+IDUBIGEO,INICIAL,TOTAL,
+ROW_NUMBER() OVER (PARTITION BY IDUBIGEO ORDER BY TOTAL ASC) as RN,
+LAG(TOTAL,1,0) OVER (PARTITION BY IDUBIGEO ORDER BY TOTAL ASC) as LAG,
+LEAD(TOTAL,1,0) OVER (PARTITION BY IDUBIGEO ORDER BY TOTAL ASC) as LEAD,
+FIRST_VALUE(TOTAL) OVER (PARTITION BY IDUBIGEO ORDER BY TOTAL ASC) as FV,
+LAST_VALUE(TOTAL) OVER (PARTITION BY IDUBIGEO ORDER BY TOTAL ASC) as LV
+from CTE_RP
+
+select * from dbo.V_PADRON order by IDUBIGEO, TOTAL ASC
