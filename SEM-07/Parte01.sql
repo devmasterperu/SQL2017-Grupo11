@@ -61,6 +61,7 @@ from CTE_NUM num
 
 --07.03
 
+--A
 select 90/10 as mod,90%10 as resto union
 select 91/10 as mod,91%10 as resto
 
@@ -87,6 +88,34 @@ select dbo.F_NUM_PAGINAS(30) as TOTPAGINAS
 --declare @totpag int=(select case when @resto=0 then @mod/@tampag else (@mod/@tampag)+1 end)
 --print 'totpag'+cast(@totpag as varchar(100))
 
+--B
+create procedure USP_R_PAGINADO_PERSONA(@tampag int,@numpag int)
+as
+begin
+	select ROW_NUMBER() OVER(ORDER BY  rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos))) AS POSICION,
+           rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos)) as NOMBRE_COMPLETO
+	from   Padron
+	where rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos))<>''
+	order by [NOMBRE_COMPLETO]
+	offset @tampag*(@numpag-1) rows 
+	fetch next @tampag rows only 
+end
 
+execute USP_R_PAGINADO_PERSONA @tampag=50,@numpag=20
 
+create view V_PAGINADO_PADRON as
+select ROW_NUMBER() OVER(ORDER BY  rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos))) AS POSICION,
+       rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos)) as NOMBRE_COMPLETO
+from   Padron
+where  rtrim(ltrim(nombres))+' '+rtrim(ltrim(apellidos))<>''
 
+create procedure USP_R_PAGINADO_PERSONA_2(@tampag int,@numpag int)
+as
+begin
+	select * from V_PAGINADO_PADRON
+	order by [NOMBRE_COMPLETO]
+	offset @tampag*(@numpag-1) rows 
+	fetch next @tampag rows only 
+end
+
+execute USP_R_PAGINADO_PERSONA_2 @tampag=50,@numpag=20
