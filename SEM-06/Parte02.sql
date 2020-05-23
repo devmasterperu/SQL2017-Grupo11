@@ -77,3 +77,21 @@ return
 	--order by m.nombre asc, f.numhabitantes ASC
 
 	select * from F_DETALLE_MANZANA(0)
+
+--06.06
+
+alter function F_DETALLE_TIPOCONSUMIDOR(@tipoconsumidor varchar) returns table as
+return
+select tipoconsumidor as 'TIPO CONSUMIDOR', idficha AS 'IDFICHA',
+numhabitantes as 'NHABITANTES', f.montopago as 'MONTOPAGO',
+ROW_NUMBER() OVER (PARTITION BY tipoconsumidor order by montopago desc,idficha desc) as RN,
+RANK()OVER (PARTITION BY tipoconsumidor order by montopago desc, idficha desc) as RK,
+DENSE_RANK()OVER (PARTITION BY tipoconsumidor order by montopago desc,idficha desc) as DRK,
+NTILE(5)OVER (PARTITION BY tipoconsumidor order by montopago desc,idficha desc) as NTILE5,
+NTILE(10)OVER (PARTITION BY tipoconsumidor order by montopago desc,idficha desc) as NTILE10,
+NTILE(15)OVER (PARTITION BY tipoconsumidor order by montopago desc,idficha desc) as NTILE15
+from Ficha f
+where  f.tipoconsumidor= case when @tipoconsumidor = 'T' THEN f.tipoconsumidor else @tipoconsumidor end
+
+select * from  F_DETALLE_TIPOCONSUMIDOR('T')
+order by [TIPO CONSUMIDOR], [MONTOPAGO] desc,[IDFICHA] desc
