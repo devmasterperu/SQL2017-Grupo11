@@ -95,3 +95,21 @@ where  f.tipoconsumidor= case when @tipoconsumidor = 'T' THEN f.tipoconsumidor e
 
 select * from  F_DETALLE_TIPOCONSUMIDOR('T')
 order by [TIPO CONSUMIDOR], [MONTOPAGO] desc,[IDFICHA] desc
+
+--06.08
+alter function F_REPORTE_MANZANA_R(@idsector int) returns table
+as return
+select m.idsector as [ID SECTOR],m.nombre as [MANZANA],isnull(rm.total,0) as TOTAL,
+ROW_NUMBER() over(partition by m.idsector order by rm.total desc) as RN,
+LAG(isnull(rm.total,0),1,0) over(partition by m.idsector order by rm.total desc) as M_LAG,
+LEAD(isnull(rm.total,0),1,0) over(partition by m.idsector order by rm.total desc) as M_LEAD,
+FIRST_VALUE(isnull(rm.total,0)) over(partition by m.idsector order by rm.total desc) as M_FV,
+LAST_VALUE(isnull(rm.total,0)) over(partition by m.idsector order by rm.total desc) as M_LV
+from Manzana m
+left join (
+ select idmanzana,count(idficha) as total from Ficha group by idmanzana
+) rm on m.idmanzana=rm.idmanzana
+where m.idsector=case when @idsector=0 then m.idsector else @idsector end
+
+select * from F_REPORTE_MANZANA_R(0)
+order by [ID SECTOR],TOTAL desc
