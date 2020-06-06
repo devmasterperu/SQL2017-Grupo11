@@ -95,6 +95,7 @@ execute usp_insManzana @nombre='0020',@idsector=1,@estado=0
 select * from sys.sysmessages where error=50020
 
 EXEC sp_addmessage @msgnum =50020, @severity =16, @msgtext ='unidad de uso existente'
+EXEC sp_dropmessage @msgnum =50020
 
 alter procedure usp_insuniuso(@descripcion varchar(40),@categoria char(3),@idficha int)
 as
@@ -132,3 +133,53 @@ end
 select * from UnidadUso where idficha=947
 
 execute usp_insuniuso @descripcion='Taller de confeccion',@categoria='EMP',@idficha=947
+
+--08.03
+
+alter procedure usp_actualiza_asignacion(@idencuestador int,@idmanzana int,@fecinicio date,
+@fecfin date,@idsupervisor int)
+as
+begin
+	begin try
+	declare @mensaje varchar(300)
+
+	if exists (select 1 from Asignacion where idencuestador=@idencuestador and idmanzana=@idmanzana) --Si existe asignación
+	begin
+		update a
+		set a.fecinicio=@fecinicio,
+			a.fecfin=@fecfin,
+			a.idsupervisor=@idsupervisor
+		from Asignacion a
+		where a.idencuestador=@idencuestador and a.idmanzana=@idmanzana
+
+		set @mensaje='Asignación actualizada'
+	end
+	else --No existe asignación
+	begin
+		THROW 50000,'No existe asignación para actualización',1;
+		--THROW 50030,'No existe asignación para actualización',1;
+	end
+
+	select @mensaje as MENSAJE,@idencuestador AS ID_ENCUESTADOR,@idmanzana as ID_MANZANA;
+
+	end try
+	begin catch
+		SELECT
+		ERROR_NUMBER() AS ERRNUM,
+		ERROR_MESSAGE() AS ERRMSG,
+		ERROR_SEVERITY() AS ERRSEV,
+		ERROR_PROCEDURE() AS ERRPROC,
+		ERROR_LINE() AS ERRLINE;
+	end catch
+end
+
+--ACTUALIZACIÓN EXITOSA
+select idencuestador,idmanzana,fecinicio,fecfin,idsupervisor from Asignacion
+where idencuestador=21 and idmanzana=5
+
+execute usp_actualiza_asignacion @idencuestador=21,@idmanzana=5,@fecinicio='2020-08-01',
+@fecfin='2020-11-30',@idsupervisor=4
+
+--ACTUALIZACIÓN CON ERROR
+execute usp_actualiza_asignacion @idencuestador=1000,@idmanzana=5,@fecinicio='2020-08-01',
+@fecfin='2020-11-30',@idsupervisor=4
