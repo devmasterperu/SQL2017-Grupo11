@@ -82,6 +82,77 @@ execute usp_insManzana @nombre='0018',@idsector=4,@estado=0
 
 select nombre,idsector from Manzana where nombre='0018'
 
+--07.06
 
+create procedure usp_insuniuso(@descripcion varchar(40),@categoria char(3),@idficha int)
+as
+begin
+	declare @iduniuso int, @mensaje varchar(500)
+	
+	if not exists(select 1 from UnidadUso where descripcion=@descripcion and idficha=@idficha)
+	begin
+		insert into UnidadUso(descripcion,categoria,idficha)
+		values(@descripcion,@categoria,@idficha)
 
+		set @mensaje='Unidad de uso insertada'
+		set @iduniuso=IDENT_CURRENT('UnidadUso')
+	end
+	else
+	begin
+		set @mensaje='Unidad de uso con descripción existente en ficha'
+		set @iduniuso=0
+	end
 
+	select @mensaje as MENSAJE, @iduniuso as UNIDAD_USO
+
+end
+
+--INSERCIÓN EXITOSA
+
+execute usp_insuniuso @descripcion='Usado por entidad del estado',@categoria='EST',@idficha=3
+select idunidaduso,descripcion,categoria from UnidadUso where idficha=3
+
+execute usp_insuniuso @descripcion='Usado por entidad del estado',@categoria='EST',@idficha=4
+select idunidaduso,descripcion,categoria from UnidadUso where idficha=4
+
+--INSERCIÓN CON ERROR
+
+execute usp_insuniuso @descripcion='Usado por entidad del estado',@categoria='EST',@idficha=3
+
+--07.07
+
+alter procedure usp_actualiza_asignacion(@idencuestador int,@idmanzana int,@fecinicio date,
+@fecfin date,@idsupervisor int)
+as
+begin
+	declare @mensaje varchar(300)
+
+	if exists (select 1 from Asignacion where idencuestador=@idencuestador and idmanzana=@idmanzana) --Si existe asignación
+	begin
+		update a
+		set a.fecinicio=@fecinicio,
+			a.fecfin=@fecfin,
+			a.idsupervisor=@idsupervisor
+		from Asignacion a
+		where a.idencuestador=@idencuestador and a.idmanzana=@idmanzana
+
+		set @mensaje='Asignación actualizada'
+	end
+	else --No existe asignación
+	begin
+		set @mensaje='Asignación no identificada'
+	end
+
+	select @mensaje as MENSAJE,@idencuestador AS ID_ENCUESTADOR,@idmanzana as ID_MANZANA
+end
+
+--ACTUALIZACIÓN EXITOSA
+select idencuestador,idmanzana,fecinicio,fecfin,idsupervisor from Asignacion
+where idencuestador=21 and idmanzana=5
+
+execute usp_actualiza_asignacion @idencuestador=21,@idmanzana=5,@fecinicio='2020-07-01',
+@fecfin='2020-12-31',@idsupervisor=4
+
+--ACTUALIZACIÓN CON ERROR
+execute usp_actualiza_asignacion @idencuestador=1000,@idmanzana=5,@fecinicio='2020-07-01',
+@fecfin='2020-12-31',@idsupervisor=4
