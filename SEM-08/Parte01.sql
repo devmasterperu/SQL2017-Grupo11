@@ -183,3 +183,118 @@ execute usp_actualiza_asignacion @idencuestador=21,@idmanzana=5,@fecinicio='2020
 --ACTUALIZACIÓN CON ERROR
 execute usp_actualiza_asignacion @idencuestador=1000,@idmanzana=5,@fecinicio='2020-08-01',
 @fecfin='2020-11-30',@idsupervisor=4
+
+--08.04
+
+alter procedure usp_actualiza_padron 
+	(
+	@idtipo int,@numdoc varchar(15),
+	@nombres varchar(50), @apellidos varchar(40), @sexo varchar(1),
+	@fecnacimiento date, @direccion varchar(300),@idubigeo int,@razon_social varchar(50)
+	)
+	as
+	begin
+		
+		begin try
+		declare @mensaje varchar(500)
+
+		if not exists(select 1 from Padron p inner join TipoDocumento t on p.idtipo=t.idtipo
+		where p.idtipo=@idtipo and numdoc=@numdoc) or @idtipo<>1--Si no existe por tipo de documento y número de documento
+		begin
+
+			THROW 50040,'No existe padrón para actualización y/o no es DNI',1
+
+		end
+		else
+		begin
+			
+			if exists(select 1 from Padron p inner join TipoDocumento t on p.idtipo=t.idtipo
+			where t.categoria='P' and p.idtipo=@idtipo and numdoc=@numdoc)--Si existe categoría 'P' para el tipo de documento y por número de documento
+			begin 
+				update p
+				set 
+					   p.nombres=@nombres,
+					   p.apellidos=@apellidos,
+					   p.sexo=@sexo,
+					   p.fecnacimiento=@fecnacimiento,
+					   p.direccion=@direccion,
+					   p.idubigeo=@idubigeo
+				from  Padron p
+				where idtipo=@idtipo and numdoc=@numdoc 
+
+				set @mensaje='Persona actualizada'
+			end
+		
+			if exists(select 1 from Padron p inner join TipoDocumento t on p.idtipo=t.idtipo
+			where t.categoria='E' and p.idtipo=@idtipo and numdoc=@numdoc)--Si existe categoría 'E' para el tipo de documento y por número de documento
+			begin
+
+				update p
+				set    p.razon_social=@razon_social,
+					   p.direccion=@direccion,
+					   p.idubigeo=@idubigeo
+				from  Padron p
+				where idtipo=@idtipo and numdoc=@numdoc 
+
+				set @mensaje='Empresa actualizada'
+			end
+			
+		end
+		select @mensaje as MENSAJE, @idtipo as TIPO, @numdoc as NUMDOC
+		end try
+		begin catch
+			SELECT
+			ERROR_NUMBER() AS ERRNUM,
+			ERROR_MESSAGE() AS ERRMSG,
+			ERROR_SEVERITY() AS ERRSEV,
+			ERROR_PROCEDURE() AS ERRPROC,
+			ERROR_LINE() AS ERRLINE;
+		end catch
+	end
+
+--ACTUALIZACIÓN DE EMPRESA
+execute usp_actualiza_padron @idtipo=3,@numdoc='20602275320',@nombres=NULL, @apellidos=NULL, 
+@sexo=NULL,@fecnacimiento=NULL, @direccion='AV. BRASIL 840 BREÑA (LIMA)',@idubigeo=2,
+@razon_social='DEV MASTER ACADEMY SAC'
+
+--ACTUALIZACIÓN DE PERSONA
+execute usp_actualiza_padron @idtipo=1,@numdoc='40249116',@nombres='GIAN CARLOS', @apellidos='MANRIQUE VALENTÍN', 
+@sexo='M',@fecnacimiento='1990-01-09', @direccion='URB. LOS CIPRESES M-25',@idubigeo=1,
+@razon_social=null
+
+--08.05
+
+alter procedure usp_eliminar_unidad(@idunidaduso int)
+as
+begin
+	begin try
+		declare @mensaje varchar(300),@idunidadusodel int=0
+	
+		if exists(select 1 from UnidadUso where idunidaduso=@idunidaduso)
+		begin
+			delete UnidadUso where idunidaduso=@idunidaduso
+
+			set @mensaje='Unidad de uso eliminada'
+			set @idunidadusodel=@idunidaduso
+		end
+		else
+		begin
+			THROW 50050,'No existe unidad de uso para eliminación',1
+		end
+
+		select @mensaje as MENSAJE, @idunidadusodel as UNIDAD_USO_ELIMINADA
+	end try
+	begin catch
+			SELECT
+			ERROR_NUMBER() AS ERRNUM,
+			ERROR_MESSAGE() AS ERRMSG,
+			ERROR_SEVERITY() AS ERRSEV,
+			ERROR_PROCEDURE() AS ERRPROC,
+			ERROR_LINE() AS ERRLINE;
+	end catch
+end
+
+--ELIMINACIÓN NO EXITOSA
+execute usp_eliminar_unidad 947
+
+select * from UnidadUso where idunidaduso=947
