@@ -298,3 +298,76 @@ end
 execute usp_eliminar_unidad 947
 
 select * from UnidadUso where idunidaduso=947
+
+--08.06
+alter table Ficha add numunidades int
+alter table Ficha drop column numunidades
+
+create procedure usp_actualiza_f_u(@descripcion varchar(40),@categoria char(3),@idficha int)
+as
+begin
+	--Operación 01
+	insert into UnidadUso(descripcion,categoria,idficha)
+	values(@descripcion,@categoria,@idficha)
+
+	--Operación 02
+	update f
+	set f.numunidades=(select count(1) from UnidadUso where idficha=@idficha)
+	from Ficha f
+	where idficha=@idficha
+end
+
+alter procedure usp_insuniuso(@descripcion varchar(40),@categoria char(3),@idficha int)
+as
+begin
+begin try
+		declare @iduniuso int, @mensaje varchar(500)
+
+		if not exists(select 1 from UnidadUso where descripcion=@descripcion and idficha=@idficha)
+		begin
+			
+			begin transaction --Inicio transacción
+				execute usp_actualiza_f_u @descripcion,@categoria,@idficha
+			commit transaction --Confirmar cambios
+		end
+		else
+		begin
+			begin transaction --Iniciar transaccion
+			raiserror('Unidad de uso existente',16,1)
+		end
+
+	end try
+	begin catch
+		rollback transaction --Deshacer cambios
+
+		SELECT
+		ERROR_NUMBER() AS ERRNUM,
+		ERROR_MESSAGE() AS ERRMSG,
+		ERROR_SEVERITY() AS ERRSEV,
+		ERROR_PROCEDURE() AS ERRPROC,
+		ERROR_LINE() AS ERRLINE;
+	end catch
+
+end
+
+--ACTUALIZACIÓN NO EXITOSA X DESCRIPCION EXISTENTE
+select * from UnidadUso where idficha=947
+execute usp_insuniuso @descripcion='Taller de confeccion',@categoria='EMP',@idficha=947
+
+--ACTUALIZACIONES EXITOSAS
+execute usp_insuniuso @descripcion='Peluquería',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Restaurante',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Pollería',@categoria='EMP',@idficha=947
+
+--ACTUALIZACION CUANDO COLUMNA numunidades no existe
+alter table Ficha drop column numunidades 
+
+execute usp_insuniuso @descripcion='Instituto',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Universidad',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Guardería',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Cuna',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Restaurant',@categoria='EMP',@idficha=947
+execute usp_insuniuso @descripcion='Cabina',@categoria='EMP',@idficha=947
+
+select * from Ficha where idficha=947
+select * from UnidadUso where idficha=947
