@@ -89,3 +89,46 @@ execute usp_insManzana @nombre='0020',@idsector=10,@estado=0
 
 --Id Sector existente
 execute usp_insManzana @nombre='0020',@idsector=1,@estado=0
+
+--08.02
+
+select * from sys.sysmessages where error=50020
+
+EXEC sp_addmessage @msgnum =50020, @severity =16, @msgtext ='unidad de uso existente'
+
+alter procedure usp_insuniuso(@descripcion varchar(40),@categoria char(3),@idficha int)
+as
+begin
+begin try
+	declare @iduniuso int, @mensaje varchar(500)
+	
+	if not exists(select 1 from UnidadUso where descripcion=@descripcion and idficha=@idficha)
+	begin
+		insert into UnidadUso(descripcion,categoria,idficha)
+		values(@descripcion,@categoria,@idficha)
+
+		set @mensaje='Unidad de uso insertada'
+		set @iduniuso=IDENT_CURRENT('UnidadUso')
+	end
+	else
+	begin
+		--raiserror(50020,16,1)
+		raiserror('Unidad de uso existente',16,1)
+	end
+
+	select @mensaje as MENSAJE, @iduniuso as UNIDAD_USO
+	end try
+	begin catch
+		SELECT
+		ERROR_NUMBER() AS ERRNUM,
+		ERROR_MESSAGE() AS ERRMSG,
+		ERROR_SEVERITY() AS ERRSEV,
+		ERROR_PROCEDURE() AS ERRPROC,
+		ERROR_LINE() AS ERRLINE;
+	end catch
+
+end
+
+select * from UnidadUso where idficha=947
+
+execute usp_insuniuso @descripcion='Taller de confeccion',@categoria='EMP',@idficha=947
